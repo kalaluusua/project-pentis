@@ -20,7 +20,7 @@ public:
     bool wallKick(RectangleShape &tile, Pentomino p, int prevRotation);
 	int getGameMode() const { return _gameMode; }
 	int getRemoves() const { return removes; }
-	void drawPieces(RectangleShape tile, RectangleShape mid, RenderWindow &app);
+    void drawPieces(RectangleShape tile, RectangleShape mid, RenderWindow &app, const vector<int>& rowsToSkip = vector<int>());
 	bool removeFullRows(RectangleShape tile, RectangleShape mid, RenderWindow & app, Sprite grid, Texture gridtexture, Text t1, Text t2, Text n1, Text n2);
 	bool timingFreezingEnding(Clock &clock, RectangleShape tile, RectangleShape mid, RenderWindow &app, Sprite grid, Texture gridtexture, Text t1, Text t2, Text n1, Text n2);
 	bool spamMove(Clock &c, int &t, Keyboard::Key key, bool &wasPressed);
@@ -28,7 +28,7 @@ public:
     int endGame(RenderWindow &App);
 
 private:
-    int TSIZE = 50;  // WIDTH OF GAME TILE IN PIXELS
+    int TSIZE = 45;  // WIDTH OF GAME TILE IN PIXELS
     bool Running = false;
     int Grid[20][10] = {0}; // Grid dimensions
     int Points = 0;

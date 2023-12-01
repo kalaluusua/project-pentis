@@ -38,14 +38,14 @@ int Highscores::Run(RenderWindow &App)
     Text Title2;
     
     Title1.setFont(font);
-    Title1.setCharacterSize(50);
+    Title1.setCharacterSize(35);
     Title1.setString("Tetris");
     Title1.setPosition({ 100, 60 });
     
     Title2.setFont(font);
-    Title2.setCharacterSize(50);
+    Title2.setCharacterSize(35);
     Title2.setString("Pentis");
-    Title2.setPosition({ 420, 60 });
+    Title2.setPosition({ 350, 60 });
     
     
     while (Running)
@@ -122,7 +122,7 @@ vector<Text> Highscores::setHighscores(string stream)
     
     float pos = 210;
     for (auto i = entries.begin(); i < entries.end(); i++) {
-        i->setCharacterSize(50);
+        i->setCharacterSize(35);
         i->setPosition({ 100, pos });
         pos += 50;
     }

@@ -35,34 +35,34 @@ int Menu::Run(RenderWindow &App)
     
     // Alternate between
     Menu1.setFont(font);
-    Menu1.setCharacterSize(50);
+    Menu1.setCharacterSize(35);
     Menu1.setString("Tetris");
     Menu1.setPosition({ 100, 160 });
     
     Menu2.setFont(font);
-    Menu2.setCharacterSize(50);
+    Menu2.setCharacterSize(35);
     Menu2.setString("Continue");
     Menu2.setPosition({ 100, 160 });
     
     // Alternate between
     Menu3.setFont(font);
-    Menu3.setCharacterSize(50);
+    Menu3.setCharacterSize(35);
     Menu3.setString("Pentis");
     Menu3.setPosition({ 100, 240 });
     
     Menu4.setFont(font);
-    Menu4.setCharacterSize(50);
+    Menu4.setCharacterSize(35);
     Menu4.setString("Main menu");
     Menu4.setPosition({ 100, 240 });
     
     // Permanent
     Menu5.setFont(font);
-    Menu5.setCharacterSize(50);
+    Menu5.setCharacterSize(35);
     Menu5.setString("Highscore");
     Menu5.setPosition({ 100, 360 });
     
     Menu6.setFont(font);
-    Menu6.setCharacterSize(50);
+    Menu6.setCharacterSize(35);
     Menu6.setString("Exit");
     Menu6.setPosition({ 100, 440 });
     

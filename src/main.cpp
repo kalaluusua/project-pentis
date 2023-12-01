@@ -11,11 +11,12 @@ using namespace std;
 
 int main(void)
 {
+
     // Applications variables
-    int tsize = 50;
+    int tsize = 45;
     int swidth = tsize * 10;
     int sheight = tsize * 20;
-    int sideb = 200;
+    int sideb = tsize*4;
     vector<cScreen*> Screens;
     int screen = 0;
     srand(int(time(NULL)));

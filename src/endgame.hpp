@@ -8,7 +8,7 @@
 using namespace sf;
 using namespace std;
 
-unsigned int eolUnix = 10, eolNonUnix = 13;
+unsigned int eolUnix = 10, eolNonUnix = 13, charSize = 35;
 
 int Game::endGame(RenderWindow &App)
 {
@@ -34,14 +34,14 @@ int Game::endGame(RenderWindow &App)
 
     Text textdidntmake;
     textdidntmake.setFont(font);
-    textdidntmake.setCharacterSize(50);
-    textdidntmake.setPosition(70, 30);
+    textdidntmake.setCharacterSize(charSize);
+    textdidntmake.setPosition(70, charSize);
     textdidntmake.setString("Not in the top 10...");
     textdidntmake.setFillColor(Color::White);
 
 	Text textAskname;
 	textAskname.setFont(font);
-    textAskname.setCharacterSize(50);
+    textAskname.setCharacterSize(charSize);
 	textAskname.setPosition(50, 30);
 	textAskname.setString("You're in the top 10!");
 	textAskname.setFillColor(Color::White);
@@ -52,12 +52,12 @@ int Game::endGame(RenderWindow &App)
     string points = "Your score: ";
     points += to_string(Points);
     score.setString(points);
-    score.setCharacterSize(50);
+    score.setCharacterSize(charSize);
     score.setFillColor(Color::Red);
     
     Text name;
     name.setFont(font);
-    name.setCharacterSize(50);
+    name.setCharacterSize(charSize);
     name.setPosition(100, 375);
     name.setString("Name:");
     name.setFillColor(Color::White);
@@ -66,25 +66,25 @@ int Game::endGame(RenderWindow &App)
     textUnderline.setFont(font);
     textUnderline.setPosition(250, 400);
     textUnderline.setString("---------");
-    textUnderline.setCharacterSize(50);
+    textUnderline.setCharacterSize(charSize);
     textUnderline.setFillColor(Color(110,110,110));
     
     Text textinput;
     textinput.setFont(font);
     textinput.setPosition(250, 375);
     textinput.setString(input);
-    textinput.setCharacterSize(50);
+    textinput.setCharacterSize(charSize);
     textinput.setFillColor(Color::White);
     
 	Text textEnter;
 	textEnter.setFont(font);
-	textEnter.setPosition(180, 830);
+	textEnter.setPosition(180, 630);
 	textEnter.setString("Enter to continue");
 	textEnter.setFillColor(Color::White);
 
 	Text textEscape;
 	textEscape.setFont(font);
-	textEscape.setPosition(200, 870);
+	textEscape.setPosition(200, 670);
 	textEscape.setString("Escape to leave");
 	textEscape.setFillColor(Color::White);
 
@@ -93,7 +93,7 @@ int Game::endGame(RenderWindow &App)
 	texthslist.setFont(font);
 	texthslist.setPosition(100, 210);
 	texthslist.setString(highslist);
-	texthslist.setCharacterSize(50);
+	texthslist.setCharacterSize(charSize);
 	texthslist.setFillColor(Color::White);
 
 	string posmarker;

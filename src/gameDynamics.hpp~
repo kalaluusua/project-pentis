@@ -82,34 +82,34 @@ bool Game::timingFreezingEnding(Clock &clock, RectangleShape tile, RectangleShap
 	return rowsWereRemoved;
 }
 
-void Game::drawPieces(RectangleShape tile, RectangleShape mid, RenderWindow &app, const vector<int>& rowsToSkip) {
-    // Draw static tiles
-    for (int y = 0; y < 20; y++) {
-        if (find(rowsToSkip.begin(), rowsToSkip.end(), y) != rowsToSkip.end()) {
-            continue; // Skip the rows specified in rowsToSkip
-        }
-        for (int x = 0; x < 10; x++) {
-            if (Grid[y][x] > 0) {
-                tile.setPosition(x * TSIZE, y * TSIZE);
-                mid.setPosition((x * TSIZE) + 1, (y * TSIZE) + 1);
-                tile.setFillColor(COLORS[Grid[y][x] - 1]);
-                app.draw(tile);
-                app.draw(mid);
-            }
-        }
-    }
+void Game::drawPieces(RectangleShape tile, RectangleShape mid, RenderWindow &app) {
+	// Draw static tiles
+	for (int y = 0; y < 20; y++)
+	{
+		for (int x = 0; x < 10; x++)
+		{
+			if (Grid[y][x] > 0)
+			{
+				tile.setPosition(x * TSIZE, y * TSIZE);
+				mid.setPosition((x * TSIZE) + 1, (y * TSIZE) + 1);
+				tile.setFillColor(COLORS[Grid[y][x] - 1]);
+				app.draw(tile);
+				app.draw(mid);
 
-    // Draw moving piece
-    for (auto i : pentoCoord) {
-        tile.setPosition(i[0] * TSIZE, i[1] * TSIZE);
-        mid.setPosition((i[0] * TSIZE) + 1, (i[1] * TSIZE) + 1);
-        tile.setFillColor(COLORS[p.getColor()]);
-        app.draw(tile);
-        app.draw(mid);
-    }
+			}
+		}
+	}
+
+	// Draw moving piece
+	for (auto i : pentoCoord)
+	{
+		tile.setPosition(i[0] * TSIZE, i[1] * TSIZE);
+		mid.setPosition((i[0] * TSIZE) + 1, (i[1] * TSIZE) + 1);
+		tile.setFillColor(COLORS[p.getColor()]);
+		app.draw(tile);
+		app.draw(mid);
+	}
 }
-
-
 
 bool Game::removeFullRows(RectangleShape tile, RectangleShape mid, RenderWindow &app, Sprite grid, Texture gridtexture, Text t1, Text t2, Text n1, Text n2) {
 	// First make tempRow for animation
@@ -122,70 +122,40 @@ bool Game::removeFullRows(RectangleShape tile, RectangleShape mid, RenderWindow 
 	app.draw(n1);
 	app.draw(n2);
 	drawPieces(tile, mid, app);
-
-    vector<int> fullRows;
-    int rowsRemoved = 0;
-
-    // Identify full rows
-    for (int row = 0; row < 20; row++) {
-        int tileCount = 0;
-        for (int col = 0; col < 10; col++) {
-            if (Grid[row][col] != 0) {
-                tileCount++;
-            }
-        }
-        if (tileCount == 10) {
-            fullRows.push_back(row);
-        }
-    }
-
-    // Redraw the grid without the full rows
-    if (!fullRows.empty()) {
-        app.clear(); // Clear the window for redrawing
-        app.draw(grid);
-        app.draw(t1);
-        app.draw(t2);
-        app.draw(n1);
-        app.draw(n2);
-        drawPieces(tile, mid, app, fullRows); // Draw pieces, skipping the full rows
-        app.display();
-        this_thread::sleep_for(chrono::milliseconds(500)); // Pause to show the grid before rows disappear
-    }
-
-    // Remove full rows and update grid
-    for (int fullRow : fullRows) {
-        for (int rowToCpy = fullRow; rowToCpy > 0; rowToCpy--) {
-            for (int colToCopy = 0; colToCopy < 10; colToCopy++) {
-                Grid[rowToCpy][colToCopy] = Grid[rowToCpy - 1][colToCopy];
-            }
-        }
-        rowsRemoved++;
-    }
-
-    // Redraw the grid with the pieces in their new positions
-    if (rowsRemoved > 0) {
-        app.clear(); // Clear the window for redrawing
-        app.draw(grid);
-        app.draw(t1);
-        app.draw(t2);
-        app.draw(n1);
-        app.draw(n2);
-        drawPieces(tile, mid, app); // Redraw the pieces in their new positions
-        app.display();
-        this_thread::sleep_for(chrono::milliseconds(500 - Speed)); // Pause for the drop effect
-    }
-
-    // Update game state after rows have dropped
-    if (rowsRemoved > 0) {
-        removes++;
-        if (!_gameMode) Speed = Speed + speedUp - removes;
-        Points += pow(2, rowsRemoved) * 10;
-        return true;
-    } else {
-        return false;
-    }
+	int rowsRemoved = 0;
+	// If row has 10 tiles freezed replace it with the row above it
+	for (int row = 0; row < 20; row++) {
+		int tileCount = 0;
+		for (int col = 0; col < 10; col++) {
+			if (Grid[row][col] != 0) {
+				tileCount++;
+			}
+		}
+		if (tileCount == 10) {
+			tempRow.setPosition(0, row * TSIZE);
+			app.draw(tempRow);
+			for (int rowToCpy = row; rowToCpy > 0; rowToCpy--) {
+				for (int colToCopy = 0; colToCopy < 10; colToCopy++) {
+					Grid[rowToCpy][colToCopy] = Grid[rowToCpy - 1][colToCopy];
+				}
+			}
+			rowsRemoved++;
+		}
+		tileCount = 0;
+	}
+	if (rowsRemoved) {
+		// Increase remove count in objects privates
+		removes++;
+		// Increase speed only for tetris
+		if (!_gameMode) Speed = Speed + speedUp - removes;
+		Points += pow(2, rowsRemoved) * 10;
+		app.display();
+		// Freeze screen for a moment to gice dropping effect 
+		this_thread::sleep_for(chrono::milliseconds(1000 - Speed));
+		return true;
+	}
+	else return false;
 }
-
 
 // Helper function to check if new pentoCoord are valid
 // aka not out of bounds or on top of static blocks
@@ -212,7 +182,6 @@ bool Game::wallKick(sf::RectangleShape &tile, Pentomino p, int tmpRotation) {
     // Tetromino wall kick data from http://tetris.wikia.com/wiki/SRS
     // Pentomino wall kick data derived using https://pbs.twimg.com/media/DX83TS-WAAAAzeN.jpg:large
     // and http://tetris.wikia.com/wiki/Pentomino
-    // https://tetris.wiki/A_Gnowius%27_Challenge
 
 	vector<char> exceptions = { 'I', 'O', 'V', 'U', 'W', 'X', 'i', 'l', ',', '.' };
 	bool isException = find(exceptions.begin(), exceptions.end(), bSymbol) != exceptions.end();
@@ -272,28 +241,6 @@ bool Game::wallKick(sf::RectangleShape &tile, Pentomino p, int tmpRotation) {
         tile.setPosition(tmpPos);
     }
     
-    // Check if the Pentomino has exactly 5 tiles
-    if (p.getPentominoSize() == 5) {
-        // Define additional test positions for Pentominoes
-        std::vector<std::vector<int>> additionalTests = {
-            {0, 0}, {1, 0}, {-1, 0}, {2, 0}, {-2, 0}, {0, 1}
-        };
-
-        for (auto test : additionalTests) {
-            int adjX = test[0];
-            int adjY = test[1];
-            tile.move(adjX*TSIZE, adjY*TSIZE);
-
-            updatePosition(tile, p);
-
-            if (isValid())
-                return true;
-
-            // Reset tile position
-            tile.setPosition(tmpPos);
-        }
-    }
-
     return false;
 }
 

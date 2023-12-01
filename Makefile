@@ -3,9 +3,9 @@ CC = $(CXX)
 RM = rm -f
 
 DEBUG_LEVEL = -g
-CPPFLAGS = -c -Wall -std=c++0x -Woverflow -Wextra 
+CPPFLAGS = -c -Wall -std=c++0x -Woverflow -Wextra -I/opt/homebrew/opt/sfml/include
 
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+LDFLAGS = -L/opt/homebrew/opt/sfml/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 DIRECTORIES = $(wildcard */)
 DIRINCLUDE = $(addprefix -I , $(DIRECTORIES))
 SOURCES = $(wildcard **/*.hpp) $(wildcard *.cpp)

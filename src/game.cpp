@@ -16,8 +16,7 @@ int Game::Run(RenderWindow &App)
 	int width = TSIZE * 10;   // width of game field
 	int initX = 4;	  // initial X-coordinate
 	int initY = 0;	  // initial X-coordinate
-	int charSize = 40;
-
+	int charSize = 35;
 
 	// Rectangle tile
 
@@ -46,14 +45,15 @@ int Game::Run(RenderWindow &App)
         throw "Error loading font res/mono.ttfs";
     }
 
-	//Grid
-	Texture grid;
-	if (!grid.loadFromFile("res/grid.png"))
-	{
-		throw "Error loading texture res/grid.png";
-	}
-	Sprite gridsprite;
-	gridsprite.setTexture(grid);
+Texture grid;
+if (!grid.loadFromFile("res/grid.png"))
+{
+    throw "Error loading texture res/grid.png";
+}
+Sprite gridsprite;
+gridsprite.setTexture(grid);
+float scale = static_cast<float>(TSIZE) / 50.0f;
+gridsprite.setScale(scale, scale);
 
 
 	Text textPoints;
