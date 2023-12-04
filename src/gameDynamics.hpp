@@ -206,6 +206,11 @@ bool Game::wallKick(sf::RectangleShape &tile, Pentomino p, int tmpRotation) {
     auto tmpPos = tile.getPosition();
     int bSymbol = p.getSymbol();
 
+    // Tetromino wall kick data from http://tetris.wikia.com/wiki/SRS
+    // Pentomino wall kick data derived using https://pbs.twimg.com/media/DX83TS-WAAAAzeN.jpg:large
+    // and http://tetris.wikia.com/wiki/Pentomino
+    // https://tetris.wiki/A_Gnowius%27_Challenge
+    
     // Define test positions for J, L, T, S, Z Tetrominoes
     std::map<std::pair<int, int>, std::vector<std::vector<int>>> standardTests = {
         {{0, 1}, {{-1, 0}, {-1, 1}, {0, -2}, {-1, -2}}},
