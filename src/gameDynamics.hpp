@@ -203,91 +203,107 @@ bool Game::isValid()
 bool Game::wallKick(sf::RectangleShape &tile, Pentomino p, int tmpRotation) {
     
     auto newRotation = p.getRotation();
-    
-    // tmp position to fall back to if isValid is false
     auto tmpPos = tile.getPosition();
-    
     int bSymbol = p.getSymbol();
-    Matrix m;
-    // Tetromino wall kick data from http://tetris.wikia.com/wiki/SRS
-    // Pentomino wall kick data derived using https://pbs.twimg.com/media/DX83TS-WAAAAzeN.jpg:large
-    // and http://tetris.wikia.com/wiki/Pentomino
-    // https://tetris.wiki/A_Gnowius%27_Challenge
 
-	vector<char> exceptions = { 'I', 'O', 'V', 'U', 'W', 'X', 'i', 'l', ',', '.' };
+    // Define test positions for J, L, T, S, Z Tetrominoes
+    std::map<std::pair<int, int>, std::vector<std::vector<int>>> standardTests = {
+        {{0, 1}, {{-1, 0}, {-1, 1}, {0, -2}, {-1, -2}}},
+        {{1, 0}, {{1, 0}, {1, -1}, {0, 2}, {1, 2}}},
+        {{1, 2}, {{1, 0}, {1, -1}, {0, 2}, {1, 2}}},
+        {{2, 1}, {{-1, 0}, {-1, 1}, {0, -2}, {-1, -2}}},
+        {{2, 3}, {{1, 0}, {1, 1}, {0, -2}, {1, -2}}},
+        {{3, 2}, {{-1, 0}, {-1, -1}, {0, 2}, {-1, 2}}},
+        {{3, 0}, {{-1, 0}, {-1, -1}, {0, 2}, {-1, 2}}},
+        {{0, 3}, {{1, 0}, {1, 1}, {0, -2}, {1, -2}}}
+    };
+
+    // Define test positions for I Tetromino
+    std::map<std::pair<int, int>, std::vector<std::vector<int>>> ITetrominoTests = {
+        {{0, 1}, {{-2, 0}, {1, 0}, {-2, -1}, {1, 2}}},
+        {{1, 0}, {{2, 0}, {-1, 0}, {2, 1}, {-1, -2}}},
+        {{1, 2}, {{-1, 0}, {2, 0}, {-1, 2}, {2, -1}}},
+        {{2, 1}, {{1, 0}, {-2, 0}, {1, -2}, {-2, 1}}},
+        {{2, 3}, {{2, 0}, {-1, 0}, {2, 1}, {-1, -2}}},
+        {{3, 2}, {{-2, 0}, {1, 0}, {-2, -1}, {1, 2}}},
+        {{3, 0}, {{1, 0}, {-2, 0}, {1, -2}, {-2, 1}}},
+        {{0, 3}, {{-1, 0}, {2, 0}, {-1, 2}, {2, -1}}}
+    };
+
+    std::map<std::pair<int, int>, std::vector<std::vector<int>>> iTrominoTests = {
+        {{0, 1}, {{-1, 0}, {1, 0}, {-1, 1}, {1, -1}}},
+        {{1, 0}, {{1, 0}, {-1, 0}, {1, -1}, {-1, 1}}},
+        {{1, 2}, {{-1, 0}, {1, 0}, {-1, -1}, {1, 1}}},
+        {{2, 1}, {{1, 0}, {-1, 0}, {1, 1}, {-1, -1}}},
+        {{2, 3}, {{1, 0}, {-1, 0}, {1, -1}, {-1, 1}}},
+        {{3, 2}, {{-1, 0}, {1, 0}, {-1, 1}, {1, -1}}},
+        {{3, 0}, {{1, 0}, {-1, 0}, {1, 1}, {-1, -1}}},
+        {{0, 3}, {{-1, 0}, {1, 0}, {-1, -1}, {1, 1}}}
+    };
+
+    std::map<std::pair<int, int>, std::vector<std::vector<int>>> otherTests = {
+        {{0, 1}, {{0, 1}}},
+        {{1, 0}, {{0, -1}}},
+        {{1, 2}, {{-1, 0}}},
+        {{2, 1}, {{1, 0}}},
+        {{2, 3}, {{0, -1}}},
+        {{3, 2}, {{0, 1}}},
+        {{3, 0}, {{1, 0}}},
+        {{0, 3}, {{-1, 0}}}
+    };
+
+
+    // Select the appropriate test based on the current rotation and symbol
+    std::vector<std::vector<int>>* currentTests = nullptr;
+
+    vector<char> exceptions = { 'I', 'O', 'V', 'U', 'W', 'X', 'i', 'l', ',', '.' };
 	bool isException = find(exceptions.begin(), exceptions.end(), bSymbol) != exceptions.end();
 
-    if (!isException) { // Not I, O, V, U, W, X, i, l, ',' or '.'
-        if (tmpRotation == 0 && newRotation == 1)      m = { {-1, 0},    {-1,-1},    { 0, 2},    {-1, 2} };
-        else if (tmpRotation == 1 && newRotation == 0) m = { { 1, 0},    { 1, 1},    { 0,-2},    { 1,-2} };
-        else if (tmpRotation == 1 && newRotation == 2) m = { { 1, 0},    { 1, 1},    { 0,-2},    { 1,-2} };
-        else if (tmpRotation == 2 && newRotation == 1) m = { {-1, 0},    {-1,-1},    { 0, 2},    {-1, 2} };
-        else if (tmpRotation == 2 && newRotation == 3) m = { { 1, 0},    { 1,-1},    { 0, 2},    { 1, 2} };
-        else if (tmpRotation == 3 && newRotation == 2) m = { {-1, 0},    {-1, 1},    { 0,-2},    {-1,-2} };
-        else if (tmpRotation == 3 && newRotation == 0) m = { {-1, 0},    {-1, 1},    { 0,-2},    {-1,-2} };
-        else if (tmpRotation == 0 && newRotation == 3) m = { { 1, 0},    { 1,-1},    { 0, 2},    { 1, 2} };
+    if (!isException) {
+        currentTests = &standardTests[{tmpRotation, newRotation}];
     }
-    else if (bSymbol == 'I') { // Is I
-        if (tmpRotation == 0 && newRotation == 1)      m = { {-2, 0},    { 1, 0},    {-2, 1},    { 1,-2} };
-        else if (tmpRotation == 1 && newRotation == 0) m = { { 2, 0},    {-1, 0},    { 2,-1},    {-1, 2} };
-        else if (tmpRotation == 1 && newRotation == 2) m = { {-1, 0},    { 2, 0},    {-1,-2},    { 2, 1} };
-        else if (tmpRotation == 2 && newRotation == 1) m = { { 1, 0},    {-2, 0},    { 1, 2},    {-2,-1} };
-        else if (tmpRotation == 2 && newRotation == 3) m = { { 2, 0},    {-1, 0},    { 2,-1},    {-1, 2} };
-        else if (tmpRotation == 3 && newRotation == 2) m = { {-2, 0},    { 1, 0},    {-2, 1},    { 1,-2} };
-        else if (tmpRotation == 3 && newRotation == 0) m = { { 1, 0},    {-2, 0},    { 1, 2},    {-2,-1} };
-        else if (tmpRotation == 0 && newRotation == 3) m = { {-1, 0},    { 2, 0},    {-1,-2},    { 2, 1} };
+    else if (bSymbol == 'I') {
+        currentTests = &ITetrominoTests[{tmpRotation, newRotation}];
+    } else if (bSymbol == 'i') {
+        currentTests = &iTrominoTests[{tmpRotation, newRotation}];
+    } else {
+        currentTests = &otherTests[{tmpRotation, newRotation}];
     }
-	else if (bSymbol == 'i') { // Is i
-		if (tmpRotation == 0 && newRotation == 1)      m = { {-1, 0},    { 1, 0},    {-1, 1},    { 1,-1} };
-		else if (tmpRotation == 1 && newRotation == 0) m = { { 1, 0},    {-1, 0},    { 1,-1},    {-1, 1} };
-		else if (tmpRotation == 1 && newRotation == 2) m = { {-1, 0},    { 1, 0},    {-1,-1},    { 1, 1} };
-		else if (tmpRotation == 2 && newRotation == 1) m = { { 1, 0},    {-1, 0},    { 1, 1},    {-1,-1} };
-		else if (tmpRotation == 2 && newRotation == 3) m = { { 1, 0},    {-1, 0},    { 1,-1},    {-1, 1} };
-		else if (tmpRotation == 3 && newRotation == 2) m = { {-1, 0},    { 1, 0},    {-1, 1},    { 1,-1} };
-		else if (tmpRotation == 3 && newRotation == 0) m = { { 1, 0},    {-1, 0},    { 1, 1},    {-1,-1} };
-		else if (tmpRotation == 0 && newRotation == 3) m = { {-1, 0},    { 1, 0},    {-1,-1},    { 1, 1} };
-	}
-    else { // Is O, V, U, W, X, l, ',' or '.'
-        if      (tmpRotation == 0 && newRotation == 1) m = { { 0, 1} };
-        else if (tmpRotation == 1 && newRotation == 0) m = { { 0,-1} };
-        else if (tmpRotation == 1 && newRotation == 2) m = { {-1, 0} };
-        else if (tmpRotation == 2 && newRotation == 1) m = { { 1, 0} };
-        else if (tmpRotation == 2 && newRotation == 3) m = { { 0,-1} };
-        else if (tmpRotation == 3 && newRotation == 2) m = { { 0, 1} };
-        else if (tmpRotation == 3 && newRotation == 0) m = { { 1, 0} };
-        else if (tmpRotation == 0 && newRotation == 3) m = { {-1, 0} };
-    }
-    
-    for (auto i : m) {
-        int adjX = i[0];
-        int adjY = i[1];
-        tile.move(adjX*TSIZE, adjY*TSIZE);
-        
-        updatePosition(tile, p);
-        
-        if (isValid())
-            return true;
-        
-        // Reset tile position
-        tile.setPosition(tmpPos);
-    }
-    
-    // Check if the Pentomino has exactly 5 tiles
-    if (p.getPentominoSize() == 5) {
-        // Define additional test positions for Pentominoes
-        std::vector<std::vector<int>> additionalTests = {
-            {0, 0}, {1, 0}, {-1, 0}, {2, 0}, {-2, 0}, {0, 1}
-        };
 
-        for (auto test : additionalTests) {
+    // Perform the tests
+    if (currentTests) {
+        for (auto& test : *currentTests) {
             int adjX = test[0];
             int adjY = test[1];
             tile.move(adjX*TSIZE, adjY*TSIZE);
 
             updatePosition(tile, p);
 
-            if (isValid())
+            if (isValid()) {
                 return true;
+            }
+
+            // Reset tile position
+            tile.setPosition(tmpPos);
+        }
+    }
+
+    // Additional tests for Pentominoes
+    if (p.getPentominoSize() == 5) {
+        std::vector<std::vector<int>> additionalTests = {
+            {0, 0}, {1, 0}, {-1, 0}, {2, 0}, {-2, 0}, {0, 1}
+        };
+
+        for (auto& test : additionalTests) {
+            int adjX = test[0];
+            int adjY = test[1];
+            tile.move(adjX*TSIZE, adjY*TSIZE);
+
+            updatePosition(tile, p);
+
+            if (isValid()) {
+                return true;
+            }
 
             // Reset tile position
             tile.setPosition(tmpPos);
@@ -296,6 +312,8 @@ bool Game::wallKick(sf::RectangleShape &tile, Pentomino p, int tmpRotation) {
 
     return false;
 }
+
+
 
 // Helper function to update position and pentoCoord
 // according to tiles position and pentoblock in question
