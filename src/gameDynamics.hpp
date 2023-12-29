@@ -189,16 +189,28 @@ bool Game::removeFullRows(RectangleShape tile, RectangleShape mid, RenderWindow 
 
 // Helper function to check if new pentoCoord are valid
 // aka not out of bounds or on top of static blocks
-bool Game::isValid()
-{
-    for (auto i : pentoCoord)
-    {
-        if (i[0] < 0 || i[0] > 9) return false;
-        if (i[1] < 0 || i[1] > 19) return false;
-		if (Grid[i[1]][i[0]] > 0) return false;
+bool Game::isValid() {
+    for (auto i : pentoCoord) {
+        // Check if the block is within the horizontal bounds of the grid
+        if (i[0] < 0 || i[0] > 9) {
+            return false;
+        }
+
+        // Check if the block is below the bottom of the grid
+        if (i[1] > 19) {
+            return false;
+        }
+
+        // Check for collisions with existing blocks only if the block is within the grid
+        if (i[1] >= 0) {
+            if (Grid[i[1]][i[0]] > 0) {
+                return false;
+            }
+        }
     }
     return true;
 }
+
 
 bool Game::wallKick(sf::RectangleShape &tile, Pentomino p, int tmpRotation) {
     
